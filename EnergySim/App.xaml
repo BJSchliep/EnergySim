@@ -1,0 +1,14 @@
+﻿<Application x:Class="EnergySim.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:EnergySim"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <SolidColorBrush x:Key="BackgroundColor">#211E2b</SolidColorBrush>
+        <SolidColorBrush x:Key="TextColor">#EBEBEB</SolidColorBrush>
+        <FontFamily x:Key="MainFont">Assets/#Droid Sans Mono</FontFamily>
+        <SolidColorBrush x:Key="OverlayColor">#7f000000</SolidColorBrush>
+        <SolidColorBrush x:Key="GridLineColor">#4F4867</SolidColorBrush>
+        
+    </Application.Resources>
+</Application>

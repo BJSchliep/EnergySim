@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>disable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\Biomass.png" />
+    <None Remove="Assets\Business.png" />
+    <None Remove="Assets\Empty.png" />
+    <None Remove="Assets\Geothermal.png" />
+    <None Remove="Assets\House.png" />
+    <None Remove="Assets\Hydroelectric.png" />
+    <None Remove="Assets\Nuclear.png" />
+    <None Remove="Assets\Solar.png" />
+    <None Remove="Assets\Turbine.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\Biomass.png" />
+    <Resource Include="Assets\Business.png" />
+    <Resource Include="Assets\Empty.png" />
+    <Resource Include="Assets\Geothermal.png" />
+    <Resource Include="Assets\House.png" />
+    <Resource Include="Assets\Hydroelectric.png" />
+    <Resource Include="Assets\Nuclear.png" />
+    <Resource Include="Assets\Solar.png" />
+    <Resource Include="Assets\Turbine.png" />
+  </ItemGroup>
+
+</Project>
