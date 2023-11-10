@@ -27,6 +27,9 @@ namespace EnergySim
             LandGrid[5, 18] = LandValue.Biomass;
         }
 
-        
+        private bool OutsideGrid(Position pos)
+        {
+            return pos.Row < 0 || pos.Row >= Rows || pos.Column < 0 || pos.Column >= Cols;
+        }
     }
 }

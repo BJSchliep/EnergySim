@@ -10,10 +10,10 @@ namespace EnergyLogic
     public abstract class Structure
     {
         public abstract LandValue Type { get; }
-        
 
-        
+      
 
-        
+
+
     }
 }

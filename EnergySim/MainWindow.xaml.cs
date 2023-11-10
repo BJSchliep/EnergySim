@@ -32,21 +32,30 @@ namespace EnergySim
         };
 
         private readonly int rows = 20, cols = 20;
+        private readonly int pRows = 9, pCols = 1;
+
         private readonly Image[,] gridImages;
         private readonly Image[,] panelImages;
-        private EnergyState energyState;
-        private Position selectedPos = null;
 
+        private EnergyState energyState;
+        private PanelState panelState;
+
+     /*   private Position selectedPos = null;
+        private PositionPanel PositionPanel = null;
+*/
         public MainWindow()
         {
             InitializeComponent();
             panelImages = SetupPanel();
             gridImages = SetupLand();
             energyState = new EnergyState(rows, cols);
+            panelState = new PanelState(pRows, pCols);
+            DrawPanelWithStructures();
             DrawGridWithStructures();
 
         }
 
+        // Grid Stuff----------------------------------------------------------------
         private Image[,] SetupLand()
         {
             /// Creates an array of images the same size
@@ -54,8 +63,6 @@ namespace EnergySim
             /// is named "GameGrid" rows and columns equal
             /// to the ones here.
             Image[,] images = new Image[rows, cols];
-            GameGrid.Rows = rows;
-            GameGrid.Columns = cols;
 
             for (int r = 0; r < rows; r++)
             {
@@ -72,40 +79,6 @@ namespace EnergySim
             return images;
         }
 
-        private Image[,] SetupPanel()
-        {
-            Image[,] panelImage = new Image[9, 1];
-            SidePanel.Rows = 9;
-            SidePanel.Columns = 1;
-
-            ImageSource[] images = new ImageSource[]
-            {
-                Images.Biomass,
-                Images.Geothermal,
-                Images.Hydroelectric,
-                Images.Nuclear,
-                Images.Solar,
-                Images.Turbine,
-                Images.Empty,
-                Images.Business,
-                Images.House
-            };
-
-            for (int r = 0; r < 9; r++)
-            {
-                Image structure = new Image
-                {
-                    Source = images[r]
-                };
-
-                panelImage[r, 0] = structure;
-                SidePanel.Children.Add(structure);
-            }
-            return panelImage;
-        }
-
-
-        // Working on this -------------------------------------
         private void GridBorder_MouseDown(object sender, MouseButtonEventArgs e)
         {
             Point point = e.GetPosition(GridBorder);
@@ -123,21 +96,12 @@ namespace EnergySim
             }
         }
 
-        private void SidePanelBorder_MouseDown(object sender, MouseButtonEventArgs e)
+        private Position ToSquarePosition(Point point)
         {
-            Point point = e.GetPosition(SidePanelBorder);
-            Position pos = ToSquarePosition(point);
-
-            ImageSource selectedImage = GetImageAtPosition(pos);
-
-            if (selectedImage != null)
-            {
-                MessageBox.Show($"Selected position - Row: {pos.Row}, Column: {pos.Column}\nImage: {selectedImage}");
-            }
-            else
-            {
-                MessageBox.Show($"No image found at position - Row: {pos.Row}, Column: {pos.Column}");
-            }
+            double squaresize = GridBorder.ActualWidth / 20;
+            int row = (int)(point.Y / squaresize);
+            int col = (int)(point.X / squaresize);
+            return new Position(row, col);
         }
 
         private ImageSource GetImageAtPosition(Position pos)
@@ -151,19 +115,6 @@ namespace EnergySim
             return selectedImage.Source;
         }
 
-
-        private Position ToSquarePosition(Point point)
-        {
-            double squaresize = GridBorder.ActualWidth / 20;
-            int row = (int)(point.Y / squaresize);
-            int col = (int)(point.X / squaresize);
-            return new Position(row, col);
-        }
-
-        
-        
-
-        // -----------------------------------------------------
         private void DrawGridWithStructures()
         {
             for (int r = 0; r < rows; r++)
@@ -176,10 +127,69 @@ namespace EnergySim
             }
         }
 
-
-        private bool OutsideGrid(Position pos)
+        // Panel Stuff----------------------------------------------------------------
+        private Image[,] SetupPanel()
         {
-            return pos.Row < 0 || pos.Row >= rows || pos.Column < 0 || pos.Column >= cols;
+            Image[,] panelImage = new Image[pRows, pCols];
+            SidePanel.Rows = pRows;
+            SidePanel.Columns = pCols;
+
+            for (int r = 0; r < pRows; r++)
+            {
+                Image structure = new Image
+                {
+                    Source = Images.Empty
+                };
+
+                panelImage[r, 0] = structure;
+                SidePanel.Children.Add(structure);
+            }
+            return panelImage;
+        }
+
+        private void SidePanelBorder_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Point point = e.GetPosition(SidePanelBorder);
+            PositionPanel pospan = ToSquarePositionPanel(point);
+
+            ImageSource selectedImage = GetImageAtPositionOnPanel(pospan);
+
+            if (selectedImage != null)
+            {
+                MessageBox.Show($"Selected position - Row: {pospan.Row}, Column: {pospan.Column}\nImage: {selectedImage}");
+            }
+            else
+            {
+                MessageBox.Show($"No image found at position - Row: {pospan.Row}, Column: {pospan.Column}");
+            }
+        }
+
+        private ImageSource GetImageAtPositionOnPanel(PositionPanel pospan)
+        {
+            if (pospan.Row < 0 || pospan.Row >= pRows || pospan.Column < 0 || pospan.Column >= pCols)
+            {
+                return null;
+            }
+
+            Image selectedImage = panelImages[pospan.Row, pospan.Column];
+            return selectedImage.Source;
+        }
+
+        private PositionPanel ToSquarePositionPanel(Point point)
+        {
+            double squaresize = SidePanelBorder.ActualWidth / pRows;
+            int row = (int)(point.Y / squaresize);
+            int col = (int)(point.X / squaresize);
+            return new PositionPanel(row, col);
+        }
+
+        private void DrawPanelWithStructures()
+        {
+            for (int r = 0; r < pRows; r++)
+            {
+                LandValue panVal = panelState.Panel[r, 0];
+                panelImages[r, 0].Source = gridValToImage[panVal];
+            }
         }
     }
 }
