@@ -1,11 +1,4 @@
-﻿using EnergyLogic;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EnergySim
+﻿namespace EnergySim
 {
     public class EnergyState
     {
@@ -31,5 +24,11 @@ namespace EnergySim
         {
             return pos.Row < 0 || pos.Row >= Rows || pos.Column < 0 || pos.Column >= Cols;
         }
+
+        //Make move method
+        /*public void MakeMove()
+        {
+
+        }*/
     }
 }

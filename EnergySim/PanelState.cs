@@ -16,7 +16,7 @@ namespace EnergySim
         {
             Rows = rows;
             Cols = cols;
-            Panel = new LandValue[Rows, Cols];
+            Panel = new LandValue[rows, cols];
             AddStructureToPanel();
         }
 
@@ -30,7 +30,6 @@ namespace EnergySim
             Panel[5, 0] = LandValue.Turbine;
             Panel[7, 0] = LandValue.Business;
             Panel[8, 0] = LandValue.House;
-
         }
     }
 }
