@@ -28,6 +28,7 @@ namespace EnergySim
             Panel[3, 0] = LandValue.Nuclear;
             Panel[4, 0] = LandValue.Solar;
             Panel[5, 0] = LandValue.Turbine;
+            Panel[6, 0] = LandValue.Water;
             Panel[7, 0] = LandValue.Business;
             Panel[8, 0] = LandValue.House;
         }

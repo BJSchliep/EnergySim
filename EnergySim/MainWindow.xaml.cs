@@ -18,7 +18,8 @@ namespace EnergySim
             {LandValue.Geothermal, Images.Geothermal},
             {LandValue.Hydroelectric, Images.Hydroelectric},
             {LandValue.Solar, Images.Solar},
-            {LandValue.Biomass, Images.Biomass}    
+            {LandValue.Biomass, Images.Biomass},
+            {LandValue.Water, Images.Water }
         };
 
         private readonly int rows = 20, cols = 20;
@@ -29,6 +30,9 @@ namespace EnergySim
 
         private EnergyState energyState;
         private PanelState panelState;
+
+        private Position firstClickPosition;
+        private LandValue selectedLandValue;
 
         public MainWindow()
         {
@@ -66,7 +70,7 @@ namespace EnergySim
             return images;
         }
 
-        private void GridBorder_MouseDown(object sender, MouseButtonEventArgs e)
+        /*private void GridBorder_MouseDown(object sender, MouseButtonEventArgs e)
         {
             Point point = e.GetPosition(GridBorder);
             Position sourcePos = ToSquarePosition(point);
@@ -75,43 +79,64 @@ namespace EnergySim
 
             if (selectedLandValue != LandValue.Empty)
             {
-                /*MessageBox.Show($"Selected position in Grid - Row: {sourcePos.Row}, Column: {sourcePos.Column}\nLandValue: {selectedLandValue}");*/
-
-                // Move the selected structure to a new position in the grid
+                // row = sourcePos.Row
+                // col = sourcePos.Column
                 MoveStructureInGrid(sourcePos, selectedLandValue);
             }
             else
             {
                 MessageBox.Show($"No LandValue found at position in Grid - Row: {sourcePos.Row}, Column: {sourcePos.Column}");
             }
-        }
-
-        private void MoveStructureInGrid(Position sourcePos, LandValue selectedLandValue)
+        }*/
+        private void GridBorder_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            // Find an empty cell in the grid for the destination position
-            for (int r = 0; r < rows; r++)
+            Point point = e.GetPosition(GridBorder);
+            Position clickedPosition = ToSquarePosition(point);
+
+            if (firstClickPosition == null)
             {
-                for (int c = 0; c < cols; c++)
+                // First click: Select the LandValue at the clicked position
+                selectedLandValue = GetLandValueAtPosition(clickedPosition);
+
+                if (selectedLandValue != LandValue.Empty)
+                { 
+                    firstClickPosition = clickedPosition;
+                }
+                else
                 {
-                    if (energyState.LandGrid[r, c] == LandValue.Empty)
-                    {
-                        // Move the structure from source position to the destination position
-                        energyState.LandGrid[r, c] = selectedLandValue;
-                        gridImages[r, c].Source = gridValToImage[selectedLandValue];
-                        gridImages[r, c].Tag = selectedLandValue; // Associate LandValue with Image
-
-                        // Clear the structure from the source position
-                        energyState.LandGrid[sourcePos.Row, sourcePos.Column] = LandValue.Empty;
-                        gridImages[sourcePos.Row, sourcePos.Column].Source = gridValToImage[LandValue.Empty];
-                        gridImages[sourcePos.Row, sourcePos.Column].Tag = LandValue.Empty; // Clear the LandValue association
-
-                        return; // Exit the loop after moving the structure
-                    }
+                    MessageBox.Show($"No LandValue found at position in Grid - Row: {clickedPosition.Row}, Column: {clickedPosition.Column}");
                 }
             }
+            else
+            {
+                // Second click: Move the selected LandValue to the new position
+                MoveStructureInGrid(firstClickPosition, clickedPosition, selectedLandValue);
 
-            // Handle the case where there is no empty cell in the grid for the destination position
-            MessageBox.Show("No empty cell in the grid to move the structure.");
+                // Reset for the next selection and move
+                firstClickPosition = null;
+                selectedLandValue = LandValue.Empty;
+            }
+        }
+
+        private void MoveStructureInGrid(Position sourcePos, Position destPos, LandValue selectedLandValue)
+        {
+            if (energyState.LandGrid[destPos.Row, destPos.Column] == LandValue.Empty)
+            {
+                // Move the structure from the source position to the destination position
+                energyState.LandGrid[destPos.Row, destPos.Column] = selectedLandValue;
+                gridImages[destPos.Row, destPos.Column].Source = gridValToImage[selectedLandValue];
+                gridImages[destPos.Row, destPos.Column].Tag = selectedLandValue; // Associate LandValue with Image
+
+                // Clear the structure from the source position
+                energyState.LandGrid[sourcePos.Row, sourcePos.Column] = LandValue.Empty;
+                gridImages[sourcePos.Row, sourcePos.Column].Source = gridValToImage[LandValue.Empty];
+                gridImages[sourcePos.Row, sourcePos.Column].Tag = LandValue.Empty; // Clear the LandValue association
+            }
+            else
+            {
+                // Handle the case where the destination position is not empty
+                MessageBox.Show("Cannot move to a non-empty cell in the grid.");
+            }
         }
 
         private Position ToSquarePosition(Point point)

@@ -16,6 +16,7 @@ namespace EnergySim
         Hydroelectric,
         Nuclear,
         Solar,
-        Turbine
+        Turbine,
+        Water
     }
 }

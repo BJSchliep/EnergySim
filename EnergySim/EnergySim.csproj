@@ -17,6 +17,7 @@
     <None Remove="Assets\Nuclear.png" />
     <None Remove="Assets\Solar.png" />
     <None Remove="Assets\Turbine.png" />
+    <None Remove="Assets\Water.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,6 +30,7 @@
     <Resource Include="Assets\Nuclear.png" />
     <Resource Include="Assets\Solar.png" />
     <Resource Include="Assets\Turbine.png" />
+    <Resource Include="Assets\Water.png" />
   </ItemGroup>
 
 </Project>

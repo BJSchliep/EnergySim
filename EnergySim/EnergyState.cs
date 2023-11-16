@@ -11,13 +11,7 @@
             Rows = rows;
             Cols = cols;
             LandGrid = new LandValue[rows, cols];
-            AddStructure();
-        }
-
-        private void AddStructure()
-        {
-            LandGrid[3, 19] = LandValue.Turbine;
-            LandGrid[5, 18] = LandValue.Biomass;
+            
         }
 
         private bool OutsideGrid(Position pos)

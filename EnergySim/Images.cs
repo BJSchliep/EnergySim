@@ -19,6 +19,7 @@ namespace EnergySim
         public readonly static ImageSource Nuclear = LoadImage("Nuclear.png");
         public readonly static ImageSource Solar = LoadImage("Solar.png");
         public readonly static ImageSource Turbine = LoadImage("Turbine.png");
+        public readonly static ImageSource Water = LoadImage("Water.png");
 
         public static ImageSource LoadImage(string path)
         {
