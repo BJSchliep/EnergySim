@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Security.Policy;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -28,11 +29,13 @@ namespace EnergySim
         private readonly Image[,] gridImages;
         private readonly Image[,] panelImages;
 
-        private EnergyState energyState;
-        private PanelState panelState;
+        private readonly EnergyState energyState;
+        private readonly PanelState panelState;
+        private readonly Money Money;
 
         private Position firstClickPosition;
         private LandValue selectedLandValue;
+
 
         public MainWindow()
         {
@@ -43,10 +46,12 @@ namespace EnergySim
             gridImages = SetupLand();
             energyState = new EnergyState(rows, cols);
 
+            
+            Money = new Money(60);
+            DisplayMoney();
+
             DrawPanelWithStructures();
             DrawGridWithStructures();
-            
-
         }
 
         // Grid Stuff----------------------------------------------------------------
@@ -58,10 +63,10 @@ namespace EnergySim
             {
                 for (int c = 0; c < cols; c++)
                 {
-                    Image image = new Image
+                    Image image = new()
                     {
                         Source = Images.Empty,
-                        Tag = LandValue.Empty // Associate LandValue with Image
+                        Tag = LandValue.Empty 
                     };
                     images[r, c] = image;
                     GameGrid.Children.Add(image);
@@ -70,24 +75,6 @@ namespace EnergySim
             return images;
         }
 
-        /*private void GridBorder_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            Point point = e.GetPosition(GridBorder);
-            Position sourcePos = ToSquarePosition(point);
-
-            LandValue selectedLandValue = GetLandValueAtPosition(sourcePos);
-
-            if (selectedLandValue != LandValue.Empty)
-            {
-                // row = sourcePos.Row
-                // col = sourcePos.Column
-                MoveStructureInGrid(sourcePos, selectedLandValue);
-            }
-            else
-            {
-                MessageBox.Show($"No LandValue found at position in Grid - Row: {sourcePos.Row}, Column: {sourcePos.Column}");
-            }
-        }*/
         private void GridBorder_MouseDown(object sender, MouseButtonEventArgs e)
         {
             Point point = e.GetPosition(GridBorder);
@@ -95,11 +82,10 @@ namespace EnergySim
 
             if (firstClickPosition == null)
             {
-                // First click: Select the LandValue at the clicked position
                 selectedLandValue = GetLandValueAtPosition(clickedPosition);
 
                 if (selectedLandValue != LandValue.Empty)
-                { 
+                {
                     firstClickPosition = clickedPosition;
                 }
                 else
@@ -109,32 +95,45 @@ namespace EnergySim
             }
             else
             {
-                // Second click: Move the selected LandValue to the new position
-                MoveStructureInGrid(firstClickPosition, clickedPosition, selectedLandValue);
+                if (firstClickPosition.Equals(clickedPosition))
+                {
+                    RemoveStructureFromGrid(clickedPosition, selectedLandValue);
+                }
+                else
+                {
+                    MoveStructureInGrid(firstClickPosition, clickedPosition, selectedLandValue);
+                }
 
-                // Reset for the next selection and move
                 firstClickPosition = null;
                 selectedLandValue = LandValue.Empty;
             }
+        }
+
+        private void RemoveStructureFromGrid(Position position, LandValue landValue)
+        {
+            energyState.LandGrid[position.Row, position.Column] = LandValue.Empty;
+            gridImages[position.Row, position.Column].Source = gridValToImage[LandValue.Empty];
+            gridImages[position.Row, position.Column].Tag = LandValue.Empty;
+
+            // Use the SubtractMoney method from the Money class
+            Money.SubtractMoney(landValue);
+            DisplayMoney();
         }
 
         private void MoveStructureInGrid(Position sourcePos, Position destPos, LandValue selectedLandValue)
         {
             if (energyState.LandGrid[destPos.Row, destPos.Column] == LandValue.Empty)
             {
-                // Move the structure from the source position to the destination position
                 energyState.LandGrid[destPos.Row, destPos.Column] = selectedLandValue;
                 gridImages[destPos.Row, destPos.Column].Source = gridValToImage[selectedLandValue];
-                gridImages[destPos.Row, destPos.Column].Tag = selectedLandValue; // Associate LandValue with Image
+                gridImages[destPos.Row, destPos.Column].Tag = selectedLandValue; 
 
-                // Clear the structure from the source position
                 energyState.LandGrid[sourcePos.Row, sourcePos.Column] = LandValue.Empty;
                 gridImages[sourcePos.Row, sourcePos.Column].Source = gridValToImage[LandValue.Empty];
-                gridImages[sourcePos.Row, sourcePos.Column].Tag = LandValue.Empty; // Clear the LandValue association
+                gridImages[sourcePos.Row, sourcePos.Column].Tag = LandValue.Empty; 
             }
             else
             {
-                // Handle the case where the destination position is not empty
                 MessageBox.Show("Cannot move to a non-empty cell in the grid.");
             }
         }
@@ -173,9 +172,6 @@ namespace EnergySim
             }
         }
 
-        // Create a Move to Position
-        // Execute move
-
         // Panel Stuff----------------------------------------------------------------
         private Image[,] SetupPanel()
         {
@@ -184,10 +180,9 @@ namespace EnergySim
             SidePanel.Columns = pCols;
             for (int r = 0; r < pRows; r++)
             {
-                Image structure = new Image
+                Image structure = new()
                 {
-                    Source = Images.Empty,
-                    Tag = LandValue.Empty // Associate LandValue with Image
+                    Source = Images.Empty
                 };
                 panelImage[r, 0] = structure;
                 SidePanel.Children.Add(structure);
@@ -204,9 +199,6 @@ namespace EnergySim
 
             if (selectedLandValue != LandValue.Empty)
             {
-                
-
-                // Add the selected structure to the grid
                 AddStructureToGrid(selectedLandValue);
             }
             else
@@ -217,17 +209,18 @@ namespace EnergySim
 
         private void AddStructureToGrid(LandValue selectedLandValue)
         {
-            // Find an empty cell in the grid and add the structure
             for (int r = 0; r < rows; r++)
             {
                 for (int c = 0; c < cols; c++)
                 {
                     if (energyState.LandGrid[r, c] == LandValue.Empty)
                     {
+                        Money.SubtractMoney(selectedLandValue);
                         energyState.LandGrid[r, c] = selectedLandValue;
                         gridImages[r, c].Source = gridValToImage[selectedLandValue];
-                        gridImages[r, c].Tag = selectedLandValue; // Associate LandValue with Image
-                        return; // Exit the loop after adding the structure
+                        gridImages[r, c].Tag = selectedLandValue;
+
+                        return;
                     }
                 }
             }
@@ -237,7 +230,7 @@ namespace EnergySim
         {
             if (pospan.Row < 0 || pospan.Row >= pRows || pospan.Column < 0 || pospan.Column >= pCols)
             {
-                return LandValue.Empty; // Return a default value or handle out-of-bounds accordingly
+                return LandValue.Empty; 
             }
 
             Image selectedImage = panelImages[pospan.Row, pospan.Column];
@@ -261,8 +254,14 @@ namespace EnergySim
                 Image panelImage = panelImages[r, 0];
 
                 panelImage.Source = gridValToImage[panVal];
-                panelImage.Tag = panVal; // Associate LandValue with Image
+                panelImage.Tag = panVal;
             }
+        }
+
+        // Money Stuff
+        private void DisplayMoney()
+        {
+            MoneyText.Text = $"Money: {Money.GetTotalMoney()}";
         }
     }
 }

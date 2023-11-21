@@ -22,15 +22,16 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <TextBlock x:Name="Energy"
+            <TextBlock x:Name="EnergyText"
                                Text="Energy" 
                                FontSize="22"
                                HorizontalAlignment="Center" TextWrapping="Wrap" 
                                 />
-            <TextBlock x:Name="Money"
-                         Text="Money =" 
-                         HorizontalAlignment="Left" 
-                         Margin="550,9,0,0" RenderTransformOrigin="0.613,0.949" />
+            <TextBlock x:Name="MoneyText"
+                       Text="Money "
+                       HorizontalAlignment="Left" 
+                       Margin="550,9,0,0" RenderTransformOrigin="0.613,0.949" />
+            
 
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
