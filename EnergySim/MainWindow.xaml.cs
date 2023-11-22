@@ -41,6 +41,7 @@ namespace EnergySim
         public MainWindow()
         {
             InitializeComponent();
+
             panelImages = SetupPanel();
             panelState = new PanelState(pRows, pCols);
 
@@ -105,6 +106,7 @@ namespace EnergySim
                     MoveStructureInGrid(firstClickPosition, clickedPosition, selectedLandValue);
                 }
 
+                // Reset
                 firstClickPosition = null;
                 selectedLandValue = LandValue.Empty;
             }
@@ -198,7 +200,7 @@ namespace EnergySim
 
             if (selectedLandValue != LandValue.Empty)
             {
-                AddStructureToGrid(selectedLandValue);
+                PanelState.AddStructureToGrid(selectedLandValue);
                 Money.SubtractMoney(selectedLandValue);
                 DisplayMoney();
                 energy.AddEnergy(selectedLandValue);
@@ -234,7 +236,6 @@ namespace EnergySim
             Image selectedImage = panelImages[pospan.Row, pospan.Column];
             return (LandValue)selectedImage.Tag;
         }
-
 
         private PositionPanel ToSquarePositionPanel(Point point)
         {
