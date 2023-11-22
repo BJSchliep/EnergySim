@@ -32,6 +32,7 @@ namespace EnergySim
         private readonly EnergyState energyState;
         private readonly PanelState panelState;
         private readonly Money Money;
+        private readonly Energy energy;
 
         private Position firstClickPosition;
         private LandValue selectedLandValue;
@@ -49,6 +50,9 @@ namespace EnergySim
             
             Money = new Money(60);
             DisplayMoney();
+
+            energy = new Energy(100);
+            DisplayEnergy();
 
             DrawPanelWithStructures();
             DrawGridWithStructures();
@@ -88,10 +92,7 @@ namespace EnergySim
                 {
                     firstClickPosition = clickedPosition;
                 }
-                else
-                {
-                    MessageBox.Show($"No LandValue found at position in Grid - Row: {clickedPosition.Row}, Column: {clickedPosition.Column}");
-                }
+                
             }
             else
             {
@@ -115,9 +116,12 @@ namespace EnergySim
             gridImages[position.Row, position.Column].Source = gridValToImage[LandValue.Empty];
             gridImages[position.Row, position.Column].Tag = LandValue.Empty;
 
-            // Use the SubtractMoney method from the Money class
-            Money.SubtractMoney(landValue);
+            
+            Money.AddMoney(landValue);
             DisplayMoney();
+
+            energy.SubtractEnergy(landValue);
+            DisplayEnergy();
         }
 
         private void MoveStructureInGrid(Position sourcePos, Position destPos, LandValue selectedLandValue)
@@ -131,10 +135,6 @@ namespace EnergySim
                 energyState.LandGrid[sourcePos.Row, sourcePos.Column] = LandValue.Empty;
                 gridImages[sourcePos.Row, sourcePos.Column].Source = gridValToImage[LandValue.Empty];
                 gridImages[sourcePos.Row, sourcePos.Column].Tag = LandValue.Empty; 
-            }
-            else
-            {
-                MessageBox.Show("Cannot move to a non-empty cell in the grid.");
             }
         }
 
@@ -194,16 +194,15 @@ namespace EnergySim
         {
             Point point = e.GetPosition(SidePanelBorder);
             PositionPanel pospan = ToSquarePositionPanel(point);
-
             LandValue selectedLandValue = GetLandValueAtPositionOnPanel(pospan);
 
             if (selectedLandValue != LandValue.Empty)
             {
                 AddStructureToGrid(selectedLandValue);
-            }
-            else
-            {
-                MessageBox.Show($"No LandValue found at position in SidePanel - Row: {pospan.Row}, Column: {pospan.Column}");
+                Money.SubtractMoney(selectedLandValue);
+                DisplayMoney();
+                energy.AddEnergy(selectedLandValue);
+                DisplayEnergy();
             }
         }
 
@@ -215,7 +214,6 @@ namespace EnergySim
                 {
                     if (energyState.LandGrid[r, c] == LandValue.Empty)
                     {
-                        Money.SubtractMoney(selectedLandValue);
                         energyState.LandGrid[r, c] = selectedLandValue;
                         gridImages[r, c].Source = gridValToImage[selectedLandValue];
                         gridImages[r, c].Tag = selectedLandValue;
@@ -262,6 +260,13 @@ namespace EnergySim
         private void DisplayMoney()
         {
             MoneyText.Text = $"Money: {Money.GetTotalMoney()}";
+        }
+
+        // Energy Stuff
+
+        private void DisplayEnergy()
+        {
+            EnergyText.Text = $"Energy: {energy.GetEnergy()}";
         }
     }
 }

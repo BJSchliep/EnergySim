@@ -8,6 +8,7 @@ namespace EnergySim
 {
     public class PanelState
     {
+        
         public int Rows { get; }
         public int Cols { get; }
         public LandValue[,] Panel { get; }
@@ -32,5 +33,23 @@ namespace EnergySim
             Panel[7, 0] = LandValue.Business;
             Panel[8, 0] = LandValue.House;
         }
+
+       /* private void AddStructureToGrid(LandValue selectedLandValue)
+        {
+            for (int r = 0; r < 20; r++)
+            {
+                for (int c = 0; c < 20; c++)
+                {
+                    if (energyState.LandGrid[r, c] == LandValue.Empty)
+                    {
+                        energyState.LandGrid[r, c] = selectedLandValue;
+                        gridImages[r, c].Source = gridValToImage[selectedLandValue];
+                        gridImages[r, c].Tag = selectedLandValue;
+
+                        return;
+                    }
+                }
+            }
+        }*/
     }
 }
