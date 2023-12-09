@@ -198,14 +198,26 @@ namespace EnergySim
             PositionPanel pospan = ToSquarePositionPanel(point);
             LandValue selectedLandValue = GetLandValueAtPositionOnPanel(pospan);
 
+
             if (selectedLandValue != LandValue.Empty)
             {
-                PanelState.AddStructureToGrid(selectedLandValue);
                 Money.SubtractMoney(selectedLandValue);
-                DisplayMoney();
-                energy.AddEnergy(selectedLandValue);
-                DisplayEnergy();
+                if (Money.IsNegative() == true)
+                {
+                    Money.AddMoney(selectedLandValue);
+                    MessageBox.Show("Insufficient funds.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                else
+                {
+                    AddStructureToGrid(selectedLandValue);
+                    DisplayMoney();
+                    energy.AddEnergy(selectedLandValue);
+                    DisplayEnergy();
+
+                }
             }
+
+            
         }
 
         private void AddStructureToGrid(LandValue selectedLandValue)
